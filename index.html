@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Svelte + Vite App</title>
+    <link rel="stylesheet" href="/css/OALoader.1.0.0.css" />
+    <link rel="stylesheet" href="/css/OAToast.1.0.0.css" />
+    <link rel="stylesheet" href="/css/OADialogs.1.0.0.css" />
+    <link rel="stylesheet" href="/css/code.css" />
+    <style>
+      /* custom */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      .right {
+        text-align: right;
+      }
+
+      oa-loader {
+        --oa-loader-custom-svg-speed: 0.9s;
+      }
+
+      oa-loader svg path {
+        fill: #ff3e00;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="code-component" class="code">
+      <div class="div-close">
+        <span onclick="window.app.closeAllCodes()"></span>
+      </div>
+      <pre>
+        <span class="yellow">/* it's necessary to make accessible count variable and showLoader function to parent */</span>
+        &lt;svelte:options accessors /&gt;
+
+        &lt;script&gt;
+          <span class="yellow">/* to make it accessible to parent we need to export this variable */</span>
+          export let <span class="green">count</span> = 0;
+          <span class="yellow">/* to make it accessible to parent we need to export this function */</span>
+          export function <span class="green">showLoader()</span> {
+            const loader = document.querySelector("oa-loader");
+            loader.show();
+            count++;
+            setTimeout(() => {
+              loader.hide();
+            }, 2000);
+          }
+          const <span class="blue">showGlobalLoader</span> = () => {
+            <span class="yellow">/* and here the loader is invoked through the global declaration window.app = {...} */</span>
+            window.app.loader.show();
+            count++;
+            setTimeout(() => {
+              window.app.loader.hide();
+            }, 2000);
+          };
+        &lt;/script&gt;
+      </pre>
+    </div>
+
+    <div id="code-app" class="code">
+      <div class="div-close">
+        <span onclick="window.app.closeAllCodes()"></span>
+      </div>
+      <pre>
+        &lt;template&gt;
+          ...
+          &lt;Counter bind:this={<span class="green">myCounter</span>} /&gt;
+          ...
+        &lt;/template&gt;
+
+        &lt;script&gt;
+        import logo from "./assets/svelte.png";
+        import Counter from "./lib/Counter.svelte";
+      
+        let <span class="green">myCounter</span>;
+      
+        const <span class="blue">showLoader</span> = () => {
+          <span class="yellow">/* here the loader is invoked through the global declaration window.app = {...} */</span>
+          window.app.loader.show();
+          <span class="yellow">/* we can access to the child component data property: count, via binding + exported variable and function */</span>
+          <span class="green">myCounter</span>.count++;
+          setTimeout(() => {
+            window.app.loader.hide();
+          }, 1000);
+        };
+        const <span class="blue">callLoaderFromComponent</span> = () => {
+          <span class="yellow">/* here the loader is invoked through the Counter component */</span>
+          <span class="green">myCounter</span>.count++;
+          <span class="green">myCounter</span>.showLoader();
+        };
+        &lt;/script&gt;
+      </pre>
+    </div>
+
+    <oa-loader>
+      <!-- in this case we're using a custom SVG as loader, the custome element will rotate this automatically -->
+      <svg
+        viewBox="0 0 128 128"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xml:space="preserve"
+        x="0"
+        y="0"
+        width="128"
+        height="128"
+      >
+        <path
+          d="M 55.426 111.9042 C 46.044 114.3632 36.1369 110.6609 30.6116 102.6313 C 27.2656 97.91 25.9475 92.0288 26.9551 86.3159 C 27.124 85.3875 27.3564 84.4719 27.6507 83.5758 L 28.1988 81.8908 L 29.69 82.9949 C 33.1339 85.5459 36.9846 87.4854 41.0761 88.73 L 42.1579 89.0608 L 42.0583 90.1493 C 41.9261 91.6977 42.342 93.2433 43.2323 94.5121 C 44.8951 96.931 47.8782 98.0471 50.7039 97.3078 C 51.3364 97.1373 51.9393 96.8701 52.4916 96.5156 L 81.5988 77.8161 C 83.0389 76.902 84.0314 75.4196 84.3337 73.7312 C 84.6354 72.0094 84.2383 70.2375 83.2316 68.8136 C 81.5678 66.3944 78.584 65.2777 75.7573 66.0164 C 75.1255 66.1869 74.5233 66.4538 73.9717 66.808 L 62.8643 73.946 C 61.0379 75.1167 59.0447 75.9991 56.9537 76.5626 C 47.5715 79.0219 37.6637 75.3195 32.1383 67.2896 C 28.7922 62.5684 27.4741 56.6872 28.4817 50.9744 C 29.4793 45.3697 32.7729 40.448 37.5545 37.4167 L 66.6598 18.7156 C 68.487 17.5429 70.4816 16.6594 72.5743 16.0958 C 81.9564 13.6367 91.8639 17.339 97.3892 25.3687 C 100.7353 30.09 102.0533 35.9712 101.0458 41.684 C 100.8762 42.6123 100.6438 43.5279 100.3502 44.4242 L 99.802 46.1092 L 98.3116 45.0067 C 94.8679 42.4543 91.0168 40.5138 86.9247 39.2692 L 85.843 38.9383 L 85.9426 37.8498 C 86.0737 36.3015 85.6579 34.7563 84.7686 33.4871 C 83.1057 31.0682 80.1227 29.9521 77.297 30.6914 C 76.6645 30.8619 76.0616 31.129 75.5093 31.4836 L 46.4015 50.1839 C 44.9612 51.0974 43.9691 52.5802 43.6683 54.2687 C 43.3647 55.9905 43.7611 57.763 44.7683 59.1869 C 46.4321 61.6062 49.4159 62.7228 52.2426 61.9841 C 52.8751 61.8133 53.4779 61.5462 54.0304 61.192 L 65.1364 54.0567 C 66.962 52.8844 68.9551 52.0013 71.0462 51.4379 C 80.4284 48.9787 90.3362 52.6811 95.8616 60.7109 C 99.2076 65.4322 100.5257 71.3133 99.5182 77.0261 C 98.5199 82.6311 95.2266 87.5533 90.4454 90.586 L 61.3406 109.2844 C 59.5133 110.4571 57.5187 111.3405 55.426 111.9042 ZM 109.3711 17.6712 C 97.7652 0.9255 74.8435 -4.038 58.27 6.6071 L 29.1629 25.3088 C 21.2121 30.3512 15.7357 38.5363 14.0766 47.8569 C 12.6882 55.6215 13.9086 63.6311 17.5446 70.6177 C 15.0531 74.4278 13.3539 78.7076 12.5495 83.1985 C 10.8743 92.698 13.0655 102.4773 18.6283 110.3286 C 30.2367 127.0759 53.1586 132.0373 69.7295 121.3928 L 98.8365 102.6911 C 106.7878 97.6492 112.2644 89.4638 113.9228 80.143 C 115.3108 72.3784 114.0912 64.369 110.457 57.3816 C 112.9477 53.5716 114.6463 49.292 115.45 44.8014 C 117.1262 35.3019 114.935 25.5222 109.3711 17.6712 Z"
+        />
+      </svg>
+    </oa-loader>
+    <oa-toast></oa-toast>
+    <oa-dialogs></oa-dialogs>
+
+    <script type="module" src="/src/main.js"></script>
+    <script src="/js/OALoader.1.0.0.js"></script>
+    <script src="/js/OAToast.1.0.0.js"></script>
+    <script src="/js/OADialogs.1.0.0.js"></script>
+    <script src="/js/scripts.js"></script>
+  </body>
+</html>
